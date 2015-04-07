@@ -41,6 +41,17 @@ options:
     required: false
     default: yes
     aliases: []
+  force:
+    description:
+      - If C(yes) and C(dest) is not a directory, will download the file every
+        time and replace the file if the contents change. If C(no), the file
+        will only be downloaded if the destination does not exist. Generally
+        should be C(yes) only for small local files. Prior to 2.0, this module
+        behaved as if C(yes) was the default.
+    version_added: "2.0"
+    required: false
+    choices: [ "yes", "no" ]
+    default: "no"
 author: "Paul Durivage (@angstwad)"
 '''
 

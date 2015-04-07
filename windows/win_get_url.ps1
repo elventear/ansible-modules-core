@@ -26,6 +26,15 @@ $result = New-Object psobject @{
     changed = $false
 }
 
+If ($params.force)
+{
+    $force = $params.force | ConvertTo-Bool
+}
+Else
+{
+    $force = $false
+}
+
 If ($params.url) {
     $url = $params.url
 }
@@ -40,17 +49,22 @@ Else {
     Fail-Json $result "missing required argument: dest"
 }
 
-$client = New-Object System.Net.WebClient
+$destIsDir = Test-Path $dest -pathType container
+$destIsFile = Test-Path $dest -pathType leaf
 
-Try {
-    $client.DownloadFile($url, $dest)
-    $result.changed = $true
-}
-Catch {
-    Fail-Json $result "Error downloading $url to $dest"
-}
+If ($destIsDir -or -not $destIsFile -or $force) {
+    $client = New-Object System.Net.WebClient
+    
+    Try {
+        $client.DownloadFile($url, $dest)
+        $result.changed = $true
+    }
+    Catch {
+        Fail-Json $result "Error downloading $url to $dest"
+    }
 
-Set-Attr $result.win_get_url "url" $url
-Set-Attr $result.win_get_url "dest" $dest
+    Set-Attr $result.win_get_url "url" $url
+    Set-Attr $result.win_get_url "dest" $dest
+}
 
 Exit-Json $result;
